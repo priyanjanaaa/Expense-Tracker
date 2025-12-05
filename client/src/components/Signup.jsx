@@ -2,18 +2,20 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 import Login from './Login';
+import Passwordfeild from './Passwordfeild';
 
 const Signup = () => {
     const navigate=useNavigate();
     const[name,setName]=useState('');
     const[email,setEmail]=useState('');
     const[password,setPassword]=useState('');
+    const[confirmPassword,setConfirmPassword]=useState('');
     const[error,setError]=useState('');
 
     const handleSignup=async(e)=>{
         e.preventDefault();
         try{
-            const response=await axios.post('http://localhost:5001/users',{name,email,password});
+            const response=await axios.post('http://localhost:5001/users',{name,email,password,confirmPassword});
             navigate('/login');
             
 
@@ -47,7 +49,13 @@ const Signup = () => {
 
         <div>
           <label className="block mb-1 font-medium">Password</label>
-          <input type="password" placeholder="Enter your password" value={password} onChange={(e)=>setPassword(e.target.value)}
+          <Passwordfeild type="password" placeholder="Enter your password" value={password} onChange={(e)=>setPassword(e.target.value)}
+            className="w-full px-3 py-2 border rounded focus:outline-0 focus:ring-2 focus:ring-blue-400"/>
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Confirm Password</label>
+          <Passwordfeild type="password" placeholder="Enter your password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}
             className="w-full px-3 py-2 border rounded focus:outline-0 focus:ring-2 focus:ring-blue-400"/>
         </div>
 
