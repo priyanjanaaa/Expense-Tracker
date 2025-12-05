@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 dotenv.config();
 export const signupRoute=async(req,res)=>{
     try{
-        const{name,email,password}=req.body;
+        const{name,email,password,confirmPassword}=req.body;
         if(!name || !email ||!password){
            return res.status(400).send("All fields must be filled");
         }
@@ -16,6 +16,9 @@ export const signupRoute=async(req,res)=>{
         const existingUser=await usersModel.findOne({email});
         if(existingUser){
             return res.status(401).send("User already exists. Consider logging in")
+        }
+        if(password!==confirmPassword){
+            return res.status(401).send("Confirm password doesnt match.");
         }
         const hashed=await bcrypt.genSalt(10);
         const hashedpwd=await bcrypt.hash(password,hashed);
