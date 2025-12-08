@@ -2,6 +2,8 @@ import { usersModel } from '../models/usersModel.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import expensesModel from '../models/expensesModel.js';
+
 dotenv.config();
 export const signupRoute=async(req,res)=>{
     try{
@@ -80,5 +82,22 @@ export const LoginRoute=async(req,res)=>{
 
     }catch(e){
         res.status(500).send("Server Error");
+    }
+}
+
+export const expensepostRoute=async(req,res)=>{
+    try{
+        const{date,category,description,amount}=req.body;
+        if(!date || !category||!description||!amount){
+            res.status(401).send("All fields have to be filed.");
+        }
+        const expense=await expensesModel.create({date,category,description,amount});
+        res.status(200).json({
+            message:"Expense added",
+            expense
+        })
+
+    }catch(e){
+        res.status(500).send("Something went wrong");
     }
 }
