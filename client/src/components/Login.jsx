@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Signup from './Signup';
 import Passwordfeild from './Passwordfeild';
+import Home from './Home';
 
 const Login = () => {
   const navigate=useNavigate();
@@ -17,6 +18,7 @@ const Login = () => {
             const response=await axios.post('http://localhost:5001/login',{email,password});
             setError(response.data.message);
             localStorage.setItem("token",response.data.token);
+            navigate('/home')
             
             
 
