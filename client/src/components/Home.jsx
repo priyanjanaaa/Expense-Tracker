@@ -18,10 +18,18 @@ const Home = () => {
       try{
         const response=await axios.post('http://localhost:5001/expense',{
           date,category,description,amount
+        },{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
         });
         setError(response.data.message);
         setAddExpenses(false);
         loadData();
+        setDate("");
+        setCategory("");
+        setDescription("");
+        setAmount("");
 
 
       }catch(e){
@@ -37,7 +45,11 @@ const Home = () => {
 
     const loadData=async()=>{
       try{
-        const response=await axios.get("http://localhost:5001/expense");
+        const response=await axios.get("http://localhost:5001/expense",{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
+        });
         setExpenses(response.data);
 
       }catch(e){
