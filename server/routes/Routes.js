@@ -28,7 +28,8 @@ export const signupRoute=async(req,res)=>{
         const user=await usersModel.create({
             name,
             email,
-            password:hashedpwd
+            password:hashedpwd,
+            
         })
 
         const token=jwt.sign(
@@ -91,7 +92,7 @@ export const expensepostRoute=async(req,res)=>{
         if(!date || !category||!description||!amount){
             res.status(401).send("All fields have to be filed.");
         }
-        const expense=await expensesModel.create({date,category,description,amount});
+        const expense=await expensesModel.create({date,category,description,amount,userId:req.user.userId});
         res.status(200).json({
             message:"Expense added",
             expense
@@ -104,7 +105,7 @@ export const expensepostRoute=async(req,res)=>{
 
 export const viewexpensesRoute=async(req,res)=>{
     try{
-        const expenses=await expensesModel.find().sort({createdAt:-1})
+        const expenses=await expensesModel.find({userId:req.user.userId}).sort({createdAt:-1})
         res.status(200).json(expenses);
 
     }catch(e){

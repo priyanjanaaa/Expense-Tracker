@@ -17,6 +17,11 @@ const expensesSchema=mongoose.Schema({
     amount:{
         type:Number,
         required:true
+    },
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"user_info",
+        required:true
     }
 })
 
