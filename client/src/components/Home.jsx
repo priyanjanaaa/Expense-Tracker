@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import axios from "axios";
 
 const Home = () => {
@@ -11,14 +11,17 @@ const Home = () => {
     const[category,setCategory]=useState('');
     const[description,setDescription]=useState('');
     const[amount,setAmount]=useState("");
+    const[expenses,setExpenses]=useState([]);
 
-    const handleSubmitExpense=async()=>{
+    const handleSubmitExpense=async(e)=>{
+      e.preventDefault();
       try{
         const response=await axios.post('http://localhost:5001/expense',{
           date,category,description,amount
         });
         setError(response.data.message);
         setAddExpenses(false);
+        loadData();
 
 
       }catch(e){
@@ -31,6 +34,25 @@ const Home = () => {
       }
 
     }
+
+    const loadData=async()=>{
+      try{
+        const response=await axios.get("http://localhost:5001/expense");
+        setExpenses(response.data);
+
+      }catch(e){
+        if(e.response && e.response.data){
+          setError(e.response.data);
+        }
+        else{
+          setError("Something went wrong");
+        }
+      }
+    }
+
+    useEffect(()=>{
+      loadData();
+    },[])
 
 
   return (
@@ -98,42 +120,23 @@ const Home = () => {
                 </thead>
 
                 <tbody className="text-sm">
-                  <tr className="hover:bg-[#2A2A2A] transition">
-                    <td className="p-2">Feb 7</td>
-                    <td className="p-2">
-                      <span className="bg-purple-600 px-2 py-1 text-xs rounded">Food</span>
-                    </td>
-                    <td className="p-2">Burger King</td>
-                    <td className="p-2 text-right text-red-400 font-semibold">₹350</td>
-                  </tr>
+                  {expenses.length > 0 ? (
+                    expenses.map((exp, index) => (
+                      <tr key={index} className="hover:bg-[#2A2A2A] transition">
+                        <td className="p-2">{new Date(exp.date).toLocaleDateString()}</td>
+                        <td className="p-2">
+                          <span className="bg-purple-600 px-2 py-1 text-xs rounded">{exp.category}</span>
+                        </td>
+                        <td className="p-2">{exp.description}</td>
+                        <td className="p-2 text-right text-red-400 font-semibold">₹{exp.amount}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td className="p-2 text-gray-500" colSpan="4">No expenses yet</td></tr>
+                  )}
 
-                  <tr className="hover:bg-[#2A2AA2] transition">
-                    <td className="p-2">Feb 6</td>
-                    <td className="p-2">
-                      <span className="bg-blue-600 px-2 py-1 text-xs rounded">Transport</span>
-                    </td>
-                    <td className="p-2">Uber</td>
-                    <td className="p-2 text-right text-red-400 font-semibold">₹120</td>
-                  </tr>
-
-                  <tr className="hover:bg-[#2A2A2A] transition">
-                    <td className="p-2">Feb 5</td>
-                    <td className="p-2">
-                      <span className="bg-green-600 px-2 py-1 text-xs rounded">Shopping</span>
-                    </td>
-                    <td className="p-2">Amazon</td>
-                    <td className="p-2 text-right text-red-400 font-semibold">₹999</td>
-                  </tr>
-
-                  <tr className="hover:bg-[#2A2A2A] transition">
-                    <td className="p-2">Feb 3</td>
-                    <td className="p-2">
-                      <span className="bg-yellow-500 text-black px-2 py-1 text-xs rounded">Bills</span>
-                    </td>
-                    <td className="p-2">Electricity</td>
-                    <td className="p-2 text-right text-red-400 font-semibold">₹560</td>
-                  </tr>
                 </tbody>
+
               </table>
             </div>
           </div>
