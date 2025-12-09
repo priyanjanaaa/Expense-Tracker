@@ -101,3 +101,13 @@ export const expensepostRoute=async(req,res)=>{
         res.status(500).send("Something went wrong");
     }
 }
+
+export const viewexpensesRoute=async(req,res)=>{
+    try{
+        const expenses=await expensesModel.find().sort({createdAt:-1})
+        res.status(200).json(expenses);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+    }
+}
