@@ -12,6 +12,10 @@ const Home = () => {
     const[description,setDescription]=useState('');
     const[amount,setAmount]=useState("");
     const[expenses,setExpenses]=useState([]);
+    const[categoryName,setCategoryName]=useState('');
+    const[categoryColor,setCategoryColor]=useState('');
+    const presetColors = ["#FF5733","#33FF57","#3357FF","#FF33B8","#FFC300","#00C9FF","#8E44AD"];
+
 
     const handleSubmitExpense=async(e)=>{
       e.preventDefault();
@@ -65,6 +69,28 @@ const Home = () => {
     useEffect(()=>{
       loadData();
     },[])
+
+    const handleAddCategory=async()=>{
+      try{
+        const response=await axios.post('http://localhost:5001/category',{name:categoryName,color:categoryColor},{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        setError(response.data.message);
+        setAddCategory(false);
+        setCategoryName('');
+        setCategoryColor('');
+
+      }catch(e){
+        if(e.response && e.response.data){
+          setError(e.response.data);
+        }
+        else{
+          setError("Something went wrong");
+        }
+      }
+    }
 
 
   return (
@@ -162,7 +188,7 @@ const Home = () => {
             <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold " onClick={()=>setAddExpenses(true)}>
               + Add Expense
             </button>
-            <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold">
+            <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold" onClick={()=>setAddCategory(true)}>
               + Add Category
             </button>
             <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold">
@@ -235,6 +261,56 @@ const Home = () => {
             </form>
         </div>
     )}
+
+  {addCategory && (
+  <div className="absolute top-10 left-72 bg-white text-black p-6 rounded-xl w-80 border shadow-xl z-50">
+
+    <h2 className="text-lg font-semibold mb-4">Add Category</h2>
+
+    {/* Category Name */}
+    <input 
+      placeholder="Category Name"
+      value={categoryName}
+      onChange={(e)=>setCategoryName(e.target.value)}
+      className="w-full border p-2 rounded mb-4"
+    />
+
+    {/* Color Selection */}
+    <div className="mb-4">
+      <p className="text-sm mb-2 font-medium">Choose color:</p>
+      <div className="flex gap-2 flex-wrap">
+        {presetColors.map(c => (
+          <div
+            key={c}
+            className={`w-8 h-8 rounded cursor-pointer border ${categoryColor === c ? "border-4 border-black":"border-gray-300"}`}
+            style={{background:c}}
+            onClick={()=>setCategoryColor(c)}
+          ></div>
+        ))}
+      </div>
+    </div>
+
+    <div className="flex gap-3">
+      <button 
+        onClick={handleAddCategory}
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+      >
+        Save
+      </button>
+
+      <button 
+        className="w-full border py-2 rounded hover:bg-gray-200"
+        onClick={()=>setAddCategory(false)}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+{error && (
+  <p>{error}</p>
+)}
+
 
 </div>
     
