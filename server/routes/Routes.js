@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import expensesModel from '../models/expensesModel.js';
+import { categoryModel } from '../models/categoryModel.js';
 
 dotenv.config();
 export const signupRoute=async(req,res)=>{
@@ -110,5 +111,29 @@ export const viewexpensesRoute=async(req,res)=>{
 
     }catch(e){
         res.status(500).send("Server Error");
+    }
+}
+
+export const addcategoryRoute=async(req,res)=>{
+    try{
+        const{name,color}=req.body;
+        if(!name || !color){
+            return res.status(400).send("All fields have to be entered");
+        }
+        const exists=await categoryModel.findOne({name});
+        if(exists){
+            return res.status(401).send("This category already exists.")
+        }
+        const category=await categoryModel.create({
+            name,
+            color
+        });
+        res.status(201).json({
+            message:"Category succesfully created",
+            category
+        })
+
+    }catch(e){
+        res.status(500).send("Server error");
     }
 }
