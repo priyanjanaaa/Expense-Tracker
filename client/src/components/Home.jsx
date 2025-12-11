@@ -15,6 +15,7 @@ const Home = () => {
     const[categoryName,setCategoryName]=useState('');
     const[categoryColor,setCategoryColor]=useState('');
     const presetColors = ["#FF5733","#33FF57","#3357FF","#FF33B8","#FFC300","#00C9FF","#8E44AD"];
+    const[categoryList,setCategoryList]=useState([]);
 
 
     const handleSubmitExpense=async(e)=>{
@@ -81,6 +82,7 @@ const Home = () => {
         setAddCategory(false);
         setCategoryName('');
         setCategoryColor('');
+        loadCategories();
 
       }catch(e){
         if(e.response && e.response.data){
@@ -91,6 +93,31 @@ const Home = () => {
         }
       }
     }
+
+    const loadCategories=async()=>{
+      try{
+        const response=await axios.get('http://localhost:5001/category',{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      setCategoryList(response.data);
+
+      }catch(e){
+        if(e.response && e.response.data){
+          setError(e.response.data);
+        }
+        else{
+          setError("Something went wrong")
+        }
+      }
+      
+
+
+    }
+    useEffect(()=>{
+      loadCategories();
+    },[])
 
 
   return (
@@ -163,8 +190,14 @@ const Home = () => {
                       <tr key={index} className="hover:bg-[#2A2A2A] transition">
                         <td className="p-2">{new Date(exp.date).toLocaleDateString()}</td>
                         <td className="p-2">
-                          <span className="bg-purple-600 px-2 py-1 text-xs rounded">{exp.category}</span>
+                          <span
+                            className="px-2 py-1 text-xs rounded"
+                            style={{ background: exp.category?.color }}
+                          >
+                            {exp.category?.name}
+                          </span>
                         </td>
+
                         <td className="p-2">{exp.description}</td>
                         <td className="p-2 text-right text-red-400 font-semibold">₹{exp.amount}</td>
                       </tr>
@@ -214,12 +247,18 @@ const Home = () => {
             />
 
             {/* Category */}
-            <select className="w-full border p-2 rounded" value={category} onChange={(e)=>setCategory(e.target.value)}>
-                <option>Select Category</option>
-                <option value="food">Food</option>
-                <option value="transport">Transport</option>
-                <option value="shopping">Shopping</option>
-                <option value="bills">Bills</option>
+            <select 
+              value={category}
+              onChange={(e)=>setCategory(e.target.value)}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">Select Category</option>
+
+              {categoryList.map(cat => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
 
             {/* Description */}
