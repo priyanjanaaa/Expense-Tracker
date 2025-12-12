@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import expensesModel from '../models/expensesModel.js';
 import { categoryModel } from '../models/categoryModel.js';
+import { budgetModel } from '../models/budgetModel.js';
 
 dotenv.config();
 export const signupRoute=async(req,res)=>{
@@ -142,6 +143,33 @@ export const getcategoryRoute=async(req,res)=>{
     try{
         const categories=await categoryModel.find();
         res.status(200).json(categories)
+
+    }catch(e){
+        res.status(500).send("Server Error");
+    }
+}
+
+export const addBudgetRoute=async(req,res)=>{
+    try{
+        
+        const{totalBudget,categoryBudget,month,year}=req.body;
+        if(!totalBudget || !month || !year){
+            res.status(400).send("Incomplete fields.Check total Budget.");
+        }
+        const budget=await budgetModel.create({
+            userId:req.user.userId,
+            totalBudget,
+            categoryBudget,
+            month,
+            year
+
+        })
+        res.status(201).json({
+            message:"Succesfully updated budget for the month.",
+            budget
+        })
+
+
 
     }catch(e){
         res.status(500).send("Server Error");

@@ -2,7 +2,7 @@ import express, { json } from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import {signupRoute,LoginRoute,expensepostRoute,viewexpensesRoute,addcategoryRoute,getcategoryRoute} from './routes/Routes.js'
+import {signupRoute,LoginRoute,expensepostRoute,viewexpensesRoute,addcategoryRoute,getcategoryRoute,addBudgetRoute} from './routes/Routes.js'
 import { authMiddleware } from './middleware/authMiddleware.js'
 dotenv.config();
 const PORT=process.env.PORT
@@ -18,6 +18,7 @@ app.post('/expense',authMiddleware,expensepostRoute);
 app.get('/expense',authMiddleware,viewexpensesRoute);
 app.post('/category',authMiddleware,addcategoryRoute);
 app.get('/category',authMiddleware,getcategoryRoute);
+app.post('/budget',authMiddleware,addBudgetRoute);
 
 app.listen(PORT,()=>{
     console.log(`Server running on ${PORT}`)
