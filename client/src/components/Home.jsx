@@ -4,8 +4,8 @@ import axios from "axios";
 
 const Home = () => {
     const[addExpenses,setAddExpenses]=useState(false);
-    const[addCategory,setAddCategory]=useState('');
-    const[budget,setBudget]=useState(null);
+    const[addCategory,setAddCategory]=useState(false);
+    const[addBudget,setAddBudget]=useState(false);
     const[error,setError]=useState('');
     const[date,setDate]=useState("");
     const[category,setCategory]=useState('');
@@ -16,6 +16,12 @@ const Home = () => {
     const[categoryColor,setCategoryColor]=useState('');
     const presetColors = ["#FF5733","#33FF57","#3357FF","#FF33B8","#FFC300","#00C9FF","#8E44AD"];
     const[categoryList,setCategoryList]=useState([]);
+    const[totalBudget,setTotalBudget]=useState('');
+    const[categoryBudget,setCategoryBudget]=useState({});
+    const now=new Date();
+    const month=now.getMonth()+1
+    const year=now.getFullYear();
+
 
 
     const handleSubmitExpense=async(e)=>{
@@ -118,6 +124,33 @@ const Home = () => {
     useEffect(()=>{
       loadCategories();
     },[])
+
+
+    const handleSaveBudget=async()=>{
+      try{
+      const formattedCategory = Object.entries(categoryBudget).map(([id, limit]) => ({
+        categoryId: id,
+        limit: Number(limit),
+      }));
+        const response=await axios.post('http://localhost:5001/budget',{totalBudget,categoryBudget:formattedCategory,month,year},{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        setAddBudget(false);
+        setTotalBudget('');
+        setCategoryBudget('');
+        
+
+      }catch(e){
+        if(e.resposne && e.response.data){
+          setError(e.response.data);
+        }
+        else{
+          setError("Something went wrong");
+        }
+      }
+    }
 
 
   return (
@@ -224,7 +257,7 @@ const Home = () => {
             <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold" onClick={()=>setAddCategory(true)}>
               + Add Category
             </button>
-            <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold">
+            <button className="bg-[#2A2A2A] hover:bg-[#333] p-4 rounded-lg text-center border border-gray-700 transition font-semibold" onClick={()=>setAddBudget(true)}>
               + Set Budget
             </button>
           </div>
@@ -301,6 +334,8 @@ const Home = () => {
         </div>
     )}
 
+    
+
   {addCategory && (
   <div className="absolute top-10 left-72 bg-white text-black p-6 rounded-xl w-80 border shadow-xl z-50">
 
@@ -346,6 +381,83 @@ const Home = () => {
     </div>
   </div>
 )}
+
+{addBudget && (
+  <div className="absolute top-10 left-72 bg-white text-black p-6 rounded-xl w-96 border shadow-xl z-50">
+
+    <h2 className="text-lg font-semibold mb-4">Set Budget</h2>
+
+    <div className="space-y-4">
+      {/* Total Monthly Budget */}
+      <div>
+        <label className="block mb-1 font-medium">Total Monthly Budget</label>
+        <input 
+          type="number"
+          placeholder="Enter total budget"
+          className="w-full border p-2 rounded"
+          value={totalBudget}
+          onChange={(e) => setTotalBudget(e.target.value)}
+        />
+      </div>
+
+      {/* Category-wise Budgets */}
+      <div>
+        <p className="font-medium mb-2">Category-wise Limits (optional)</p>
+
+        <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+
+          {categoryList.map(cat => (
+            <div key={cat._id} className="flex items-center justify-between">
+              
+              {/* Category label with color badge */}
+              <div className="flex items-center gap-2">
+                <span 
+                  className="w-4 h-4 rounded"
+                  style={{ background: cat.color }}
+                ></span>
+                <p>{cat.name}</p>
+              </div>
+
+              {/* Input for limit */}
+              <input 
+                type="number"
+                placeholder="₹"
+                className="border p-1 w-24 rounded"
+                value={categoryBudget[cat._id] || ""}
+                onChange={(e) =>
+                  setCategoryBudget(prev => ({
+                    ...prev,
+                    [cat._id]: e.target.value
+                  }))
+                }
+              />
+            </div>
+          ))}
+
+        </div>
+      </div>
+    </div>
+
+    {/* Buttons */}
+    <div className="flex gap-3 mt-5">
+      <button 
+        onClick={handleSaveBudget}
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+      >
+        Save
+      </button>
+
+      <button 
+        className="w-full border py-2 rounded hover:bg-gray-200"
+        onClick={() => setAddBudget(false)}
+      >
+        Cancel
+      </button>
+    </div>
+
+  </div>
+)}
+
 {error && (
   <p>{error}</p>
 )}
