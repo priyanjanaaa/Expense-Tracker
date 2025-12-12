@@ -106,7 +106,7 @@ export const expensepostRoute=async(req,res)=>{
 
 export const viewexpensesRoute=async(req,res)=>{
     try{
-        const expenses=await expensesModel.find({userId:req.user.userId}).sort({createdAt:-1})
+        const expenses=await expensesModel.find({userId:req.user.userId}).populate("category").sort({createdAt:-1})
         res.status(200).json(expenses);
 
     }catch(e){
@@ -135,5 +135,15 @@ export const addcategoryRoute=async(req,res)=>{
 
     }catch(e){
         res.status(500).send("Server error");
+    }
+}
+
+export const getcategoryRoute=async(req,res)=>{
+    try{
+        const categories=await categoryModel.find();
+        res.status(200).json(categories)
+
+    }catch(e){
+        res.status(500).send("Server Error");
     }
 }
