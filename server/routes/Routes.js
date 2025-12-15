@@ -175,3 +175,17 @@ export const addBudgetRoute=async(req,res)=>{
         res.status(500).send("Server Error");
     }
 }
+
+export const getMonthlyRoute=async(req,res)=>{
+    try{
+        const {month,year}=req.query;
+        const userId=req.user.userId;
+        const monthly=await budgetModel.findOne({userId,month:Number(month),year:Number(year)},
+            
+        )
+        res.status(200).json(monthly);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+    }
+}
