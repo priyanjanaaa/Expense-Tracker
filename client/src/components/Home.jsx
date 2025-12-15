@@ -16,15 +16,17 @@ const Home = () => {
     const[categoryColor,setCategoryColor]=useState('');
     const presetColors = ["#FF5733","#33FF57","#3357FF","#FF33B8","#FFC300","#00C9FF","#8E44AD"];
     const[categoryList,setCategoryList]=useState([]);
-    const[totalBudget,setTotalBudget]=useState('');
+    const[totalBudget,setTotalBudget]=useState(0);
     const[categoryBudget,setCategoryBudget]=useState({});
     const now=new Date();
     const month=now.getMonth()+1
     const year=now.getFullYear();
+    const [spent,setSpent]=useState(0);
 
 
 
     const handleSubmitExpense=async(e)=>{
+      
       e.preventDefault();
       try{
         const response=await axios.post('http://localhost:5001/expense',{
@@ -34,6 +36,7 @@ const Home = () => {
             Authorization:`Bearer ${localStorage.getItem("token")}`
           }
         });
+       
         setError(response.data.message);
         setAddExpenses(false);
         loadData();
@@ -62,6 +65,10 @@ const Home = () => {
           }
         });
         setExpenses(response.data);
+        const totalSpent=response.data.reduce((sum,exp)=>
+          sum+Number(exp.amount),0
+        )
+        setSpent(totalSpent);
 
       }catch(e){
         if(e.response && e.response.data){
@@ -140,6 +147,7 @@ const Home = () => {
         setAddBudget(false);
         setTotalBudget('');
         setCategoryBudget('');
+        getMonthlyData();
         
 
       }catch(e){
@@ -151,6 +159,30 @@ const Home = () => {
         }
       }
     }
+
+    const getMonthlyData=async()=>{
+      try{
+        const response=await axios.get(`http://localhost:5001/budget?month=${month}&year=${year}`,{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        setTotalBudget(response.data.totalBudget);
+
+
+      }catch(e){
+        if(e.response && e.response.data){
+          setError(e.response.data);
+        }
+        else{
+          setError("Something went wrong");
+        }
+      }
+    }
+
+    useEffect(()=>{
+      getMonthlyData();
+    },[]);
 
 
   return (
@@ -185,19 +217,15 @@ const Home = () => {
             <div className="space-y-3">
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Monthly Budget</span>
-                <span className="text-green-400 font-semibold">₹ 10,000</span>
+                <span className="text-green-400 font-semibold">{totalBudget}</span>
               </div>
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Used</span>
-                <span className="text-red-400 font-semibold">₹ 6,400</span>
+                <span className="text-red-400 font-semibold">{spent}</span>
               </div>
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Remaining</span>
-                <span className="text-yellow-300 font-semibold">₹ 3,600</span>
-              </div>
-              <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
-                <span>Recurring Expenses</span>
-                <span className="text-blue-400 font-semibold">₹ 1,200</span>
+                <span className="text-yellow-300 font-semibold">{totalBudget-spent}</span>
               </div>
             </div>
           </div>
