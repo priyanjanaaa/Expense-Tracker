@@ -1,7 +1,14 @@
 import React from "react";
 import { useState,useEffect } from "react";
 import axios from "axios";
-
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from "chart.js";
+import {Pie} from "react-chartjs-2"
+ChartJS.register(ArcElement,Tooltip,Legend);
 const Home = () => {
     const[addExpenses,setAddExpenses]=useState(false);
     const[addCategory,setAddCategory]=useState(false);
@@ -22,6 +29,28 @@ const Home = () => {
     const month=now.getMonth()+1
     const year=now.getFullYear();
     const [spent,setSpent]=useState(0);
+
+    const categoriesTotal={};
+    const categoryColors = {};
+    expenses.forEach(exp=>{
+      const name=exp.category?.name||"Other";
+      categoriesTotal[name]=(categoriesTotal[name]||0)+Number(exp.amount)
+      categoryColors[name] = exp.category.color;
+    })
+
+    const pieData={
+      label:Object.keys(categoriesTotal),
+      datasets:[{
+        data:Object.values(categoriesTotal),
+        backgroundColor:Object.keys(categoriesTotal).map(
+        name => categoryColors[name])
+      }]
+    }
+
+    const pieOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+};
 
 
 
@@ -290,7 +319,36 @@ const Home = () => {
             </button>
           </div>
         </div>
+        
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+
+        <div className="lg:col-span-2 bg-[#1E1E1E] p-6 rounded-l shadow">
+          <h3 className="text-xl font-semibold mb-4">Spending Trend</h3>
+        </div>
+
+
+        <div className="bg-[#1E1E1E] p-4 rounded-l shadow">
+          <h3 className="text-xl font-semibold mb-4">Category Breakdown</h3>
+          <div className="flex justify-center items-center">
+            <div className="w-[320px] h-[320px]">
+            <Pie data={pieData} />
+          </div>
+
+          </div>
+          
+          
+         </div>
+
+
+        <div className="bg-[#1E1E1E] p-6 rounded-xl shadow">
+          <h3 className="text-xl font-semibold mb-4">Budget vs Spent</h3>
+        </div>
+
+      </div>
       </main>
+
+      
+
 
       {addExpenses && (
         <div className="absolute top-10 left-72 bg-white text-black p-6 rounded-xl shadow-xl border border-gray-300 w-80 z-50">
