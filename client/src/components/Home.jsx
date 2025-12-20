@@ -1,14 +1,20 @@
 import React from "react";
 import { useState,useEffect } from "react";
 import axios from "axios";
-import {
+import{
   Chart as ChartJS,
-  ArcElement,
   Tooltip,
-  Legend
-} from "chart.js";
-import {Pie} from "react-chartjs-2"
-ChartJS.register(ArcElement,Tooltip,Legend);
+  ArcElement,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement
+
+} from 'chart.js'
+import {Pie,Bar,Line} from 'react-chartjs-2';
+ChartJS.register(Tooltip,ArcElement,Legend,CategoryScale,LinearScale,PointElement,LineElement,BarElement);
 const Home = () => {
     const[addExpenses,setAddExpenses]=useState(false);
     const[addCategory,setAddCategory]=useState(false);
@@ -23,34 +29,87 @@ const Home = () => {
     const[categoryColor,setCategoryColor]=useState('');
     const presetColors = ["#FF5733","#33FF57","#3357FF","#FF33B8","#FFC300","#00C9FF","#8E44AD"];
     const[categoryList,setCategoryList]=useState([]);
-    const[totalBudget,setTotalBudget]=useState(0);
+    const [totalBudget,setTotalBudget] = useState({
+  totalBudget: 0,
+  categoryBudget: []
+});
     const[categoryBudget,setCategoryBudget]=useState({});
     const now=new Date();
     const month=now.getMonth()+1
     const year=now.getFullYear();
     const [spent,setSpent]=useState(0);
 
+
     const categoriesTotal={};
-    const categoryColors = {};
+    const CategoryColors={};
+
     expenses.forEach(exp=>{
-      const name=exp.category?.name||"Other";
-      categoriesTotal[name]=(categoriesTotal[name]||0)+Number(exp.amount)
-      categoryColors[name] = exp.category.color;
+      const name=exp.category?.name||"Others";
+      categoriesTotal[name]=(categoriesTotal[name]||0)+Number(exp.amount);
+      CategoryColors[name]=exp.category.color;
     })
 
     const pieData={
-      label:Object.keys(categoriesTotal),
+      labels:Object.keys(categoriesTotal),
       datasets:[{
         data:Object.values(categoriesTotal),
-        backgroundColor:Object.keys(categoriesTotal).map(
-        name => categoryColors[name])
+        backgroundColor:Object.keys(categoriesTotal).map(name=>CategoryColors[name])
       }]
     }
 
-    const pieOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-};
+    const budgetMap={};
+    totalBudget?.categoryBudget?.forEach(c=>{
+      budgetMap[c.categoryId]=c.limit
+    })
+
+    const spentMap={}
+    expenses.forEach(exp=>{
+      const id=exp.category?._id
+      spentMap[id]=(spentMap[id]||0)+Number(exp.amount);
+    })
+
+    const barLabels=categoryList.map(c=>c.name);
+    const barBudget=categoryList.map(c=>(
+      budgetMap[c._id]||0
+    ))
+    const barSpent=categoryList.map(c=>(
+      spentMap[c._id]||0
+    ))
+
+    const barData={
+      labels:barLabels,
+      datasets:[{
+        label:"Budget",
+        data:barBudget,
+        backgroundColor:"rgba(54, 162, 235, 0.7)"
+      },{
+        label:"spent",
+        data:barSpent,
+        backgroundColor:"rgba(255, 99, 132, 0.7)"
+
+      }]
+
+    }
+
+    const dailyTotals={}
+    expenses.forEach(exp=>{
+      const day=new Date(exp.date).toLocaleDateString();
+      dailyTotals[day]=(dailyTotals[day]||0)+Number(exp.amount);
+
+    })
+   
+    const lineData={
+      labels:Object.keys(dailyTotals),
+      datasets:[{
+        label:"Spending over Time",
+        data:Object.values(dailyTotals),
+        borderColor: "cyan",
+        backgroundColor: "rgba(0,255,255,0.2)",
+        tension: 0.3
+      }]
+    }
+
+    
 
 
 
@@ -196,7 +255,7 @@ const Home = () => {
             Authorization:`Bearer ${localStorage.getItem("token")}`
           }
         });
-        setTotalBudget(response.data.totalBudget);
+        setTotalBudget(response.data);
 
 
       }catch(e){
@@ -246,7 +305,7 @@ const Home = () => {
             <div className="space-y-3">
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Monthly Budget</span>
-                <span className="text-green-400 font-semibold">{totalBudget}</span>
+                <span className="text-green-400 font-semibold">{totalBudget.totalBudget}</span>
               </div>
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Used</span>
@@ -254,7 +313,7 @@ const Home = () => {
               </div>
               <div className="flex justify-between bg-[#2A2A2A] p-3 rounded-lg">
                 <span>Remaining</span>
-                <span className="text-yellow-300 font-semibold">{totalBudget-spent}</span>
+                <span className="text-yellow-300 font-semibold">{totalBudget.totalBudget-spent}</span>
               </div>
             </div>
           </div>
@@ -324,6 +383,7 @@ const Home = () => {
 
         <div className="lg:col-span-2 bg-[#1E1E1E] p-6 rounded-l shadow">
           <h3 className="text-xl font-semibold mb-4">Spending Trend</h3>
+          <Line data={lineData} height={50}/>
         </div>
 
 
@@ -342,6 +402,7 @@ const Home = () => {
 
         <div className="bg-[#1E1E1E] p-6 rounded-xl shadow">
           <h3 className="text-xl font-semibold mb-4">Budget vs Spent</h3>
+          <Bar data={barData}/>
         </div>
 
       </div>
@@ -481,7 +542,7 @@ const Home = () => {
           type="number"
           placeholder="Enter total budget"
           className="w-full border p-2 rounded"
-          value={totalBudget}
+          value={totalBudget.totalBudget}
           onChange={(e) => setTotalBudget(e.target.value)}
         />
       </div>
