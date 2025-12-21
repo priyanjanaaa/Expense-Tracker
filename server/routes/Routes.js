@@ -107,7 +107,7 @@ export const expensepostRoute=async(req,res)=>{
 
 export const viewexpensesRoute=async(req,res)=>{
     try{
-        const expenses=await expensesModel.find({userId:req.user.userId}).populate("category").sort({createdAt:-1})
+        const expenses=await expensesModel.find({userId:req.user.userId}).populate("category").sort({date:-1}).limit(Number(req.query.limit)||0);
         res.status(200).json(expenses);
 
     }catch(e){
