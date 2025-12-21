@@ -1,6 +1,8 @@
 import React from "react";
 import { useState,useEffect } from "react";
+import{Link} from 'react-router-dom'
 import axios from "axios";
+import Expensespage from "./Expensespage";
 import{
   Chart as ChartJS,
   Tooltip,
@@ -16,6 +18,7 @@ import{
 import {Pie,Bar,Line} from 'react-chartjs-2';
 ChartJS.register(Tooltip,ArcElement,Legend,CategoryScale,LinearScale,PointElement,LineElement,BarElement);
 const Home = () => {
+    
     const[addExpenses,setAddExpenses]=useState(false);
     const[addCategory,setAddCategory]=useState(false);
     const[addBudget,setAddBudget]=useState(false);
@@ -290,7 +293,7 @@ const Home = () => {
 
         <nav className="space-y-32 text-gray-300 mb-100 text-center">
           <p className="hover:text-white cursor-pointer">🏠 Dashboard</p>
-          <p className="hover:text-white cursor-pointer">📄 Expenses</p>
+          <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
           <p className="hover:text-white cursor-pointer">🏷 Categories</p>
           <p className="hover:text-white cursor-pointer">💰 Budgets</p>
           <p className="hover:text-white cursor-pointer">⚙ Settings</p>
