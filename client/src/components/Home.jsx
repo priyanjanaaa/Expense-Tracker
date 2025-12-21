@@ -38,6 +38,7 @@ const Home = () => {
     const month=now.getMonth()+1
     const year=now.getFullYear();
     const [spent,setSpent]=useState(0);
+    const[recentExpenses,setRecentExpenses]=useState([]);
 
 
     const categoriesTotal={};
@@ -157,6 +158,12 @@ const Home = () => {
           sum+Number(exp.amount),0
         )
         setSpent(totalSpent);
+        const recent=await axios.get('http://localhost:5001/expense?limit=4',{
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem("token")}`
+          }
+        })
+        setRecentExpenses(recent.data);
 
       }catch(e){
         if(e.response && e.response.data){
@@ -334,8 +341,8 @@ const Home = () => {
                 </thead>
 
                 <tbody className="text-sm">
-                  {expenses.length > 0 ? (
-                    expenses.map((exp, index) => (
+                  {recentExpenses.length > 0 ? (
+                    recentExpenses.map((exp, index) => (
                       <tr key={index} className="hover:bg-[#2A2A2A] transition">
                         <td className="p-2">{new Date(exp.date).toLocaleDateString()}</td>
                         <td className="p-2">
