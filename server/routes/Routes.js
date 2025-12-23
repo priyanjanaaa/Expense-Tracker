@@ -195,3 +195,59 @@ export const getMonthlyRoute = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+export const updateProfileRoute=async(req,res)=>{
+    try{
+        const userId=req.user.userId;
+        const{name,email,password}=req.body;
+        if(!password|| password.trim() === ""){
+            return res.status(401).send("Passwors required to make changes.")
+
+        }
+        const user=await usersModel.findById(userId);
+        if(!user){
+            return res.status(401).send("No such user.");
+
+        }
+        const match=await bcrypt.compare(password,user.password);
+        if(!match){
+            return res.status(400).send("Wrong password. Try again");
+        }
+
+        if(name) user.name=name;
+        if(email) user.email=email;
+        await user.save();
+
+        res.status(201).json({message:"Succesfully updated the details."})
+
+    }catch(e){
+        console.log(e);
+        res.status(500).send("Something went wrong");
+    }
+}
+
+export const updatePasswordRoute=async(req,res)=>{
+    try{
+        const userId=req.user.userId;
+        const{oldPassword,newPassword}=req.body;
+        if(!oldPassword||!newPassword){
+            return res.status(400).send("All fields are required");
+        }
+        const user=await usersModel.findById(userId);
+        if(!user){
+            return res.status(401).send("No such user");
+        }
+        const match=await bcrypt.compare(oldPassword,user.password);
+        if(!match){
+            res.status(400).send("Incorrect password! Try again");
+        }
+
+        user.password=await bcrypt.hash(newPassword,10);
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+
+    }catch(e){
+        console.log(e);
+        res.status(500).send("Something went wrong");
+    }
+}

@@ -3,11 +3,11 @@ export const authMiddleware=async(req,res,next)=>{
     try{
         const authHandler=req.header("Authorization");
         if(!authHandler){
-            res.status(401).send("No authorization provided");
+            return res.status(401).send("No authorization provided");
         }
         const parts=authHandler.split(" ");
         if(parts.length!==2 || parts[0]!=='Bearer'){
-            res.status(400).send("Wrong authorization");
+            return res.status(400).send("Wrong authorization");
         }
 
         const token=parts[1];
@@ -16,6 +16,6 @@ export const authMiddleware=async(req,res,next)=>{
         next();
 
     }catch(e){
-        res.status(500).send("Authorization error");
+        return res.status(500).send("Authorization error");
     }
 }
