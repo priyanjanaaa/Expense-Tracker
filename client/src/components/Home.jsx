@@ -294,7 +294,6 @@ const Home = () => {
         <nav className="space-y-32 text-gray-300 mb-100 text-center">
           <p className="hover:text-white cursor-pointer">🏠 Dashboard</p>
           <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
-          <p className="hover:text-white cursor-pointer">🏷 Categories</p>
           <p className="hover:text-white cursor-pointer">💰 Budgets</p>
           <p className="hover:text-white cursor-pointer">⚙ Settings</p>
           <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
