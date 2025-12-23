@@ -176,16 +176,22 @@ export const addBudgetRoute=async(req,res)=>{
     }
 }
 
-export const getMonthlyRoute=async(req,res)=>{
-    try{
-        const {month,year}=req.query;
-        const userId=req.user.userId;
-        const monthly=await budgetModel.findOne({userId,month:Number(month),year:Number(year)},
-            
-        )
-        res.status(200).json(monthly);
+export const getMonthlyRoute = async (req, res) => {
+  try {
+    const { month, year } = req.query;
+    const userId = req.user.userId;
 
-    }catch(e){
-        res.status(500).send("Server Error");
-    }
-}
+    const monthly = await budgetModel
+      .findOne({
+        userId,
+        month: Number(month),
+        year: Number(year)
+      })
+      .populate("categoryBudget.categoryId");   // <-- THIS ONLY
+
+    res.status(200).json(monthly);
+
+  } catch (e) {
+    res.status(500).send("Server Error");
+  }
+};
