@@ -2,6 +2,9 @@ import React from 'react'
 import axios from 'axios'
 import { useState,useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import Expensespage from './Expensespage'
+import Home from './Home'
+import SettingsPage from './SettingsPage'
 
 const BudgetPage = () => {
     const[totalBudget,setTotalBudget]=useState(0);
@@ -70,6 +73,16 @@ const BudgetPage = () => {
 
  return (
   <div className="flex min-h-screen bg-[#121212] text-white">
+          <aside className="w-60 bg-[#1A1A1A] p-6 space-y-6">
+                  <h1 className="text-2xl font-bold mb-6 ">Expense Tracker</h1>
+                  <nav className="space-y-32 text-gray-300 mb-100 text-center">
+                      <p><Link to='/home' className="hover:text-white cursor-pointer">🏠 Dashboard</Link></p>
+                      <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
+                      <p><Link to='/budget' className="hover:text-white cursor-pointer">💰 Budgets</Link></p>
+                      <p><Link to='/settings' className="hover:text-white cursor-pointer">⚙ Settings</Link></p>
+                      <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
+                  </nav>
+          </aside>
 
     {/* ===== Sidebar (optional if you already included) ===== */}
     <aside className="w-60 bg-[#1A1A1A] p-6 space-y-6">

@@ -3,6 +3,8 @@ import { useState,useEffect } from "react";
 import{Link} from 'react-router-dom'
 import axios from "axios";
 import Expensespage from "./Expensespage";
+import BudgetPage from "./BudgetPage";
+import SettingsPage from "./SettingsPage";
 import{
   Chart as ChartJS,
   Tooltip,
@@ -289,16 +291,15 @@ const Home = () => {
        
       {/* ================= SIDEBAR ================= */}
       <aside className="w-60 bg-[#1A1A1A] p-6 space-y-6">
-        <h1 className="text-2xl font-bold mb-6 ">Expense Tracker</h1>
-
-        <nav className="space-y-32 text-gray-300 mb-100 text-center">
-          <p className="hover:text-white cursor-pointer">🏠 Dashboard</p>
-          <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
-          <p className="hover:text-white cursor-pointer">💰 Budgets</p>
-          <p className="hover:text-white cursor-pointer">⚙ Settings</p>
-          <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
-        </nav>
-      </aside>
+                   <h1 className="text-2xl font-bold mb-6 ">Expense Tracker</h1>
+                   <nav className="space-y-32 text-gray-300 mb-100 text-center">
+                       <p><Link to='/home' className="hover:text-white cursor-pointer">🏠 Dashboard</Link></p>
+                       <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
+                       <p><Link to='/budget' className="hover:text-white cursor-pointer">💰 Budgets</Link></p>
+                       <p><Link to='/settings' className="hover:text-white cursor-pointer">⚙ Settings</Link></p>
+                       <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
+                   </nav>
+           </aside>
       
 
       {/* ================= MAIN CONTENT ================= */}

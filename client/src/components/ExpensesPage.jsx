@@ -3,6 +3,8 @@ import axios from 'axios'
 import { useState,useEffect } from 'react'
 import {Link} from 'react-router-dom'
 import Home from './Home'
+import BudgetPage from './BudgetPage'
+import SettingsPage from './SettingsPage'
 
 
 const Expensespage = () => {
@@ -37,15 +39,14 @@ const Expensespage = () => {
 <>
 <div className="flex  bg-[#121212] text-white">
       <aside className="w-60 bg-[#1A1A1A] p-6 space-y-6">
-        <h1 className="text-2xl font-bold mb-6 ">Expense Tracker</h1>
-
-        <nav className="space-y-32 text-gray-300 mb-100 text-center">
-          <p><Link to='/Home' className="hover:text-white cursor-pointer">🏠 Dashboard</Link></p>
-          <p className="hover:text-white cursor-pointer">📄 Expenses</p>
-          <p className="hover:text-white cursor-pointer">💰 Budgets</p>
-          <p className="hover:text-white cursor-pointer">⚙ Settings</p>
-          <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
-        </nav>
+              <h1 className="text-2xl font-bold mb-6 ">Expense Tracker</h1>
+              <nav className="space-y-32 text-gray-300 mb-100 text-center">
+                  <p><Link to='/home' className="hover:text-white cursor-pointer">🏠 Dashboard</Link></p>
+                  <p><Link to='/expenses' className="hover:text-white cursor-pointer">📄 Expenses</Link></p>
+                  <p><Link to='/budget' className="hover:text-white cursor-pointer">💰 Budgets</Link></p>
+                  <p><Link to='/settings' className="hover:text-white cursor-pointer">⚙ Settings</Link></p>
+                  <p className="hover:text-red-400 cursor-pointer">🚪 Logout</p>
+              </nav>
       </aside>
       <div className=" flex-1 p-6 rounded-xl shadow space-y-4">
         <h3 className="text-xl font-semibold">All Expenses</h3>
